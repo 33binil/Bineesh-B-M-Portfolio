@@ -66,8 +66,8 @@ export const LoadingScreen = ({ onComplete }) => {
     if (!canvas) return;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(42, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
-    camera.position.set(0, 0.4, 4.4);
+    const camera = new THREE.PerspectiveCamera(46, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+    camera.position.set(0, 0.4, 5.4);
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -341,11 +341,17 @@ export const LoadingScreen = ({ onComplete }) => {
       if (!canvas) return;
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
+      if (width === 0 || height === 0) return;
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);
     };
     window.addEventListener('resize', handleResize);
+
+    // Apply correct sizing once the canvas has laid out with its responsive box
+    handleResize();
+    requestAnimationFrame(handleResize);
+    const initSizeTimeout = setTimeout(handleResize, 300);
 
     // --- RENDER LOOP ---
     let animationFrameId;
@@ -388,6 +394,7 @@ export const LoadingScreen = ({ onComplete }) => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
+      clearTimeout(initSizeTimeout);
       renderer.dispose();
     };
   }, []);
@@ -512,7 +519,7 @@ export const LoadingScreen = ({ onComplete }) => {
       </div>
 
       {/* 3. Center 3D Camera Canvas Stage */}
-      <div className="relative w-full max-w-2xl h-[320px] sm:h-[400px] md:h-[460px] flex items-center justify-center z-10">
+      <div className="relative w-full max-w-[min(560px,90vw,58vh)] aspect-[5/4] flex items-center justify-center z-10">
         
         {/* 3D Canvas */}
         <canvas 
